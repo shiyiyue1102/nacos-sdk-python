@@ -633,10 +633,11 @@ class NacosClient:
             key_list = self.process_mgr.list()
             key_list.append(cache_key)
             sys_os = platform.system()
-
-            puller = Thread(target=self._do_pulling, args=(key_list, self.notify_queue))
+            if sys_os == 'Windows' or sys_os == 'Darwin':
+              puller = Thread(target=self._do_pulling, args=(key_list, self.notify_queue))
+            else:
+              puller = Process(target=self._do_pulling, args=(key_list, self.notify_queue))
             puller.setDaemon(True)
-
             puller.start()
             self.puller_mapping[cache_key] = (puller, key_list)
 
